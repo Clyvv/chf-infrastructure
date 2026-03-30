@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: chf-postgres-prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-chfdb}
+      POSTGRES_USER: ${POSTGRES_USER:-chfuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+    networks:
+      - chf-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-chfuser} -d ${POSTGRES_DB:-chfdb}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: always
+    # Security: Don't expose ports in production (only backend connects internally)
+
+  # Spring Boot Backend
+  backend:
+    # Use pre-built image from DTR in production
+    image: ${DOCKER_REGISTRY:-hub.docker.com}/chf-backend:${IMAGE_TAG:-latest}
+    container_name: chf-backend-prod
+    environment:
+      # Database connection (use service name 'postgres' as hostname)
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-chfdb}?currentSchema=public
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-chfuser}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
+      
+      # Liquibase configuration
+      SPRING_LIQUIBASE_ENABLED: "true"
+      SPRING_LIQUIBASE_SHOULD_RUN: "true"
+      
+      # JPA configuration
+      SPRING_JPA_HIBERNATE_DDL_AUTO: none
+      SPRING_JPA_SHOW_SQL: "false"
+      
+      # Server configuration
+      SERVER_PORT: 8124
+      SERVER_SERVLET_CONTEXT_PATH: /api
+      
+      # Spring profiles
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+    ports:
+      - "${BACKEND_PORT:-8124}:8124"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - chf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8124/api/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 3s
+      start_period: 60s
+      retries: 5
+    restart: always
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G
+        reservations:
+          cpus: '1'
+          memory: 512M
+
+volumes:
+  postgres_prod_data:
+    driver: local
+
+networks:
+  chf-network:
+    driver: bridge
+
