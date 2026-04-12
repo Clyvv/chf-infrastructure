@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  frontend:
+    image: chf-frontend:${IMAGE_TAG:-latest}
+    container_name: chf-frontend-prod
+    ports:
+      - "5173:80"
+    networks:
+      - chf-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+    restart: always
+
+networks:
+  chf-network:
+    external: true
