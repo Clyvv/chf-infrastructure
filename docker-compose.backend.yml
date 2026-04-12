@@ -94,5 +94,5 @@ volumes:
 
 networks:
   chf-network:
-    driver: bridge
+    external: true
 
