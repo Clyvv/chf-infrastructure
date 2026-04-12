@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   frontend:
-    image: chf-frontend:${IMAGE_TAG:-latest}
+    image: docker.io/cmawoko/chf-frontend:${IMAGE_TAG:-latest}
     container_name: chf-frontend-prod
     ports:
       - "5173:80"
