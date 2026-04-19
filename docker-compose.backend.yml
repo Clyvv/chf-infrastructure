@@ -63,6 +63,8 @@ services:
       
       # Spring profiles
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+    volumes:
+      - logs:/app/logs
     ports:
       - "${BACKEND_PORT:-8124}:8124"
     depends_on:
