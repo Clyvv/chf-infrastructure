@@ -1,0 +1,29 @@
+
+# Elasticsearch Production Configuration for v8.11.0
+cluster.name: "chf-cluster"
+node.name: "es-node-1"
+# Network
+network.host: 0.0.0.0
+http.port: 9200
+# Paths
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+# Security
+xpack.security.enabled: true
+xpack.security.enrollment.enabled: true
+# Transport layer security (TLS/SSL)
+xpack.security.transport.ssl.enabled: false
+xpack.security.http.ssl.enabled: false
+# Discovery (single-node for now, update for cluster)
+discovery.type: single-node
+# Index settings
+action.auto_create_index: true
+action.destructive_requires_name: true
+# Performance tuning
+indices.memory.index_buffer_size: 10%
+indices.queries.cache.size: 10%
+# NOTE: The following settings are REMOVED in Elasticsearch 8.x and are always enabled:
+# - xpack.ilm.enabled (Index Lifecycle Management - always enabled)
+# - xpack.monitoring.enabled (Monitoring - always enabled) 
+# - xpack.monitoring.collection.enabled (use Stack Monitoring in Kibana instead)
+# If you need to configure monitoring, use Kibana's Stack Monitoring UI

@@ -1,0 +1,17 @@
+# Logstash Production Configuration
+# Pipeline settings
+pipeline.workers: 2
+pipeline.batch.size: 125
+pipeline.batch.delay: 50
+# Queue settings (persistent queue for reliability)
+queue.type: persisted
+queue.max_bytes: 1gb
+queue.checkpoint.writes: 1024
+# API settings
+api.http.host: 0.0.0.0
+api.http.port: 9600
+# Logs
+log.level: info
+path.logs: /usr/share/logstash/logs
+# NOTE: xpack.monitoring.* settings are deprecated in Logstash 8.x
+# Use Stack Monitoring in Kibana instead

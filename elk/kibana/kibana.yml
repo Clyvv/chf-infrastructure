@@ -1,0 +1,45 @@
+# Kibana Production Configuration
+
+# Server
+server.host: "0.0.0.0"
+server.port: 5601
+server.name: "chf-kibana"
+# server.publicBaseUrl: "http://localhost:5601"  # Uncomment and set if needed
+
+# Elasticsearch connection
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+elasticsearch.username: "kibana_system"
+elasticsearch.password: "${KIBANA_PASSWORD}"
+
+# Security
+xpack.security.enabled: true
+xpack.encryptedSavedObjects.encryptionKey: "${KIBANA_ENCRYPTION_KEY}"
+
+# Session
+xpack.security.session.idleTimeout: "1h"
+xpack.security.session.lifespan: "8h"
+
+# Monitoring
+monitoring.ui.enabled: true
+
+# Telemetry
+telemetry.enabled: false
+telemetry.optIn: false
+
+# Logging (Kibana 8.x format)
+logging:
+  appenders:
+    console:
+      type: console
+      layout:
+        type: pattern
+  root:
+    appenders: [console]
+    level: info
+
+# Data views
+data.search.aggs.shardDelay.enabled: true
+
+
+
+
