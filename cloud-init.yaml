@@ -5,7 +5,6 @@ package_upgrade: true
 
 packages:
   - docker.io
-  - docker-compose
   - nginx
   - ufw
   - git
@@ -24,6 +23,8 @@ runcmd:
   # Enable Docker
   - systemctl enable docker
   - systemctl start docker
+  - sh -c 'apt-get install -y docker-compose-plugin || apt-get install -y docker-compose-v2'
+  - docker compose version
 
   # Firewall setup
   - ufw allow OpenSSH
